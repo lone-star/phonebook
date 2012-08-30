@@ -13,7 +13,7 @@ function(app) {
 
     index: function() {
 
-    },
+    }
   });
   return Router;
 
