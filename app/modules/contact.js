@@ -17,7 +17,9 @@ function(app, Backbone, Views) {
 
   // Default model.
   Contact.Model = Backbone.Model.extend({
-		url: app.root + 'server/index.php/contacts/'
+		url: function() {
+			return app.root + 'server/index.php/contacts/';
+		}
   });
 
   // Default collection.

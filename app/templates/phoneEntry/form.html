@@ -1,0 +1,9 @@
+<div id="create-phone">
+	<input id="new-phone-number" placeholder="Number" type="text"/>
+	<select id="new-phone-type">
+		<% _.each(phone_types, function(type) { %>
+			<option value="<%= type %>"><%= type %></option>
+		<% }); %>
+	</select>
+	<button id="new-phone-submit" class="btn btn-primary">Add</button>
+</div>

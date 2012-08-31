@@ -66,8 +66,8 @@ function(app, Backbone) {
 				})).render();
 			}, this);
 
-			//listen for delete modele
-			this.collection.on('remove', function(item){
+			//listen for delete models
+			this.collection.on('remove', function(item) {
 				this.getView(function(view) {
 					return view.model === item;
 				}).remove();

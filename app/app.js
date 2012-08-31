@@ -20,6 +20,9 @@ function($, _, Backbone) {
   // Localize or create a new JavaScript Template object.
   var JST = window.JST = window.JST || {};
 
+	//Configure Backbone for http
+	Backbone.emulateHTTP = true;
+
   // Configure LayoutManager with Backbone Boilerplate defaults.
   Backbone.LayoutManager.configure({
     paths: {
