@@ -7,24 +7,27 @@ describe('Form View', function() {
 		],
 
 		function(Contact) {
-			var list, form;
+			var list, form, main;
 
 			//Create the list and the form
-			list = new Contact.Collection;
+			list = new Contact.Collection();
 			form = new Contact.Views.Form({
 				collection: list
-			}).render();
+			});
+			
+			//create and render the layout
+			main = new Backbone.Layout();
+			main.setView('.form', form);
+			main.render();
+			
+			//render the form
+			form.render(function() {
+				//set form data and submit
+				form.$('#new-contact-first_name').val('Michael');
+				form.$('#new-contact-last_name').val('Phelips');
+				form.$('#new-contact-submit').trigger('click');
 
-			//set form data and submit
-			form.$('#new-contact-first_name').val('Michael');
-			form.$('#new-contact-last_name').val('Phelips');
-			form.$('#new-contact-submit').trigger('click');
-
-			//check results
-//			setTimeout(function() {
-				
-				
-				//verify collection
+				//check results
 				expect(list.length)
 					.toBe(1);
 				expect(list.at(0).get('first_name'))
@@ -39,22 +42,28 @@ describe('Form View', function() {
 					.toBe('');
 
 				semaphore --;
-
-//			}, 500);
+			});
 		});
 		waitsFor(function() { return semaphore === 0 }); 
 	});
+	//TODO: make test with validators
 });
 
 
 
-describe('Form List', function() {
+describe('List View', function() {
+	var main;
+
+	afterEach(function() {
+		main = null;
+	});
+
 	it('can add a new item when a model is added to the collection',
 			function() {
 
 		var semaphore = 1;
 		require([
-		'module/contact'
+		'modules/contact'
 		],
 
 		function(Contact) {
@@ -64,25 +73,31 @@ describe('Form List', function() {
 			col = new Contact.Collection();
 			list = new Contact.Views.List({
 				collection: col
-			}).render();
+			});
 
-			col.add(new Contact.Model({
-				first_name: 'Michael',
-				last_name: 'Phelips'
-			}));
+			//Create and render the layout
+			main = new Backbone.Layout();
+			main.setView('.list', list);
+			main.render();
 
-			//Check result
-			expect(col.getViews().size())
-				.toBe(1);
-			
-			item = col.getViews().toArray().first();
-			expect(item.model.get('first_name'))
-				.toBe('Michael');
-			expect(item.model.get('last_name'))
-				.toBe('Phelips');
+			list.render(function() {
+				col.add(new Contact.Model({
+					first_name: 'Michael',
+					last_name: 'Phelips'
+				}));
 
-			semaphore --;
-			
+				//Check result
+				expect(list.getViews().size().value())
+					.toBe(1);
+				
+				item = list.getViews().toArray().first().value();
+				expect(item.model.get('first_name'))
+					.toBe('Michael');
+				expect(item.model.get('last_name'))
+					.toBe('Phelips');
+
+				semaphore --;
+			});
 		});
 		waitsFor(function() { return semaphore === 0 });
 	});
@@ -93,7 +108,7 @@ describe('Form List', function() {
 
 		var semaphore = 1;
 		require([
-		'module/contact'
+		'modules/contact'
 		],
 
 		function(Contact) {
@@ -110,16 +125,26 @@ describe('Form List', function() {
 			//create the list
 			list = new Contact.Views.List({
 				collection: col
-			}).render();
+			});
 
-      col.remove(model);
+			//Create and render the layout
+			main = new Backbone.Layout();
+			main.setView('.list', list);
+			main.render();
 
-			//Check Result
-			expect(list.getView().size())
-				.toBe(0);
+			list.render(function() {
+				col.remove(model);
 
-			semaphore --;
+				//Check Result
+				// The number of elements containing the string Michael
+				expect(list.$el.find('*:contains("Michael")').size())
+					.toBe(0);
+				//the number of elements containing the string Phelips
+				expect(list.$el.find('*:contains("Phelips")').size())
+					.toBe(0);
 
+				semaphore --;
+			});
 		});
 		waitsFor(function() {return semaphore === 0});
 	});
@@ -128,10 +153,16 @@ describe('Form List', function() {
 
 
 describe('Item', function() {
+	var main;
+
+	afterEach(function() {
+		main = null;
+	});
+
 	it('can be updated when a model is updated', function() {
 		var semaphore = 1;
 		require([
-		'module/contact'
+		'modules/contact'
 		],
 
 		function(Contact) {
@@ -148,13 +179,21 @@ describe('Item', function() {
 				model: model
 			});
 
-			model.set('first_name', 'Felix');
+			//Create and render the layout
+			main = new Backbone.Layout();
+			main.setView('.item', item);
+			main.render();
 
-			//Check Result
-			expect(item.$('contact-item-first_name').val())
-				.toBe('Felix');
+			item.render(function() {
+				model.set('first_name', 'Felix');
 
-			semaphore --;
+				//Check Result
+				expect(item.$('.contact-item-first_name').text())
+					.toBe('Felix');
+
+				semaphore --;
+			});
+
 		});
 		waitsFor(function() { return semaphore === 0});
 	});
@@ -163,7 +202,7 @@ describe('Item', function() {
 	it('can update a model', function() {
 		var semaphore = 1;
 		require([
-		'module/contact'
+		'modules/contact'
 		],
 
 		function(Contact) {
@@ -176,23 +215,30 @@ describe('Item', function() {
 			});
 
 			//Create an item
-			item = new Concat.Views.Item({
+			item = new Contact.Views.Item({
 				model: model
 			});
 
-			//modify the model
-			item.$('.edit-item').trigger('click');
-			item.$('.first_name-input').val('Felix');
-			item.$('.last_name-input').val('Lechat');
-			item.$('.save-item').trigger('click');
+			//Create and render the layout
+			main = new Backbone.Layout();
+			main.setView('.item', item);
+			main.render();
 
-			//Check result
-			expect(model.get('first_name'))
-				.toBe('Felix');
-			expect(model.get('last_name'))
-				.toBe('Lechat');
+			item.render(function() {
+				//modify the model
+				item.$('.edit-item').trigger('click');
+				item.$('.first_name-input').val('Felix');
+				item.$('.last_name-input').val('Lechat');
+				item.$('.save-item').trigger('click');
 
-			semaphore --;
+				//Check result
+				expect(model.get('first_name'))
+					.toBe('Felix');
+				expect(model.get('last_name'))
+					.toBe('Lechat');
+
+				semaphore --;
+			});
 		});
 		waitsFor(function() {return semaphore === 0});
 	});
@@ -201,11 +247,11 @@ describe('Item', function() {
 	it('can delete a model', function() {
 		var semaphore = 1;
 		require([
-		'module/contact'
+		'modules/contact'
 		],
 
 		function(Contact) {
-			var model, item;
+			var model, item, col;
 			
 			//Create a model
 			model = new Contact.Model({
@@ -213,21 +259,30 @@ describe('Item', function() {
 				last_name: 'Phelips'
 			});
 
+			//Add the model inside a collection
+			col = new Contact.Collection();
+			col.add(model);
+
 			//Create an item
-			item = new Concat.Views.Item({
+			item = new Contact.Views.Item({
 				model: model
 			});
 
-			//delete the model
-			item.$('.remove-item').trigger('click');
+			//Create and render the layout
+			main = new Backbone.Layout();
+			main.setView('.item', item);
+			main.render();
 
-			//check the result
-			expect(model.has('first_name'))
-				.toBe(false);
-			expect(model.has('last_name'))
-				.toBe(false);
-				
-			semaphore --;
+			item.render(function() {
+				//delete the model
+				item.$('.remove-item').trigger('click');
+
+				//Check result
+				expect(col.length)
+					.toBe(0);
+					
+				semaphore --;
+			});
 		});
 		waitsFor(function() {return semaphore === 0});
 	});

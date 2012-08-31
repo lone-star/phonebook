@@ -17,7 +17,7 @@ function(app, Backbone, Views) {
 
   // Default model.
   Contact.Model = Backbone.Model.extend({
-  
+		url: app.root + 'server/index.php/contacts/'
   });
 
   // Default collection.
@@ -30,5 +30,4 @@ function(app, Backbone, Views) {
 
   // Return the module for AMD compliance.
   return Contact;
-
 });

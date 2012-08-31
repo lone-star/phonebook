@@ -159,7 +159,10 @@ module.exports = function(grunt) {
     // The headless Jasmine testing is provided by grunt-jasmine-task. Simply
     // point the configuration to your test directory.
     jasmine: {
-      all: ["test/jasmine/*.html"]
+      all: {
+ 				src: ["test/jasmine/*.html"],
+				errorReporting: true 
+			}
     }
 
   });
