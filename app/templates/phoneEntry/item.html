@@ -1,12 +1,12 @@
 <div class="phone-item">
-	<div class="display">
+	<div class="display form-inline">
+		<span class="phone-item-type"><%= type %>:</span>
 		<span class="phone-item-number"><%= number %></span>
-		<span class="phone-item-type"><%= type %></span>
 		<a class="edit-item btn btn-small" href="#"><i class="icon-edit"></i></a>
 		<a class="remove-item btn btn-small" href="#"><i class="icon-remove"></i></a>
 	</div>
-	<div class="edit">
-		<input class="number-input" type="text" value="<% number %>" />
+	<div class="edit form-inline">
+		<input class="number-input" type="text" value="<%= number %>" />
 		<select class="type-input">
 			<% _.each(phone_types, function(item) { %>
 				<option value="<%= item %>" <%= (item === type) ? 'selected' : '' %> >
@@ -14,5 +14,5 @@
 				</option>
 			<% }); %>
 		</select>
-		<a class="save-item btn btn-small" href="#"><i class"icon-ok"></i></a>
+		<a class="save-item btn btn-small" href="#"><i class="icon-ok"></i></a>
 </div>

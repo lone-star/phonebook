@@ -380,6 +380,9 @@ describe('Phone Entry', function() {
 								number: '987654321',
 								type: 'work'
 							})).url());
+						
+						//remove callback
+						col.off();
 						semaphore --;
 					});
 				});

@@ -128,12 +128,14 @@ describe('Contact', function() {
 					collection: col
 				});
 
+				//add the model to the collection
+
 				//Create and render the layout
 				main = new Backbone.Layout();
 				main.setView('.list', list);
 				main.render();
 
-				list.render(function() {
+				list.render(function(el) {
 					col.remove(model);
 
 					//Check Result

@@ -1,13 +1,15 @@
 <div class="contact-item">
-	<div class="display">
+	<div class="display form-inline">
 		<span class="contact-item-first_name"><%= first_name %></span>
 		<span class="contact-item-last_name"><%= last_name %></span>
-		<a class="edit-item btn btn-small" href="#"><i class="icon-edit"></i></a>
-		<a class="remove-item btn btn-small" href="#"><i class="icon-remove"></i></a>
+		<button class="edit-item btn btn-small"><i class="icon-edit"></i></button>
+		<button class="remove-item btn btn-small"><i class="icon-remove"></i></button>
+		<span class="phone-arrow">></span>
 	</div>
-	<div class="edit">
+	<div class="edit form-inline">
 		<input class="first_name-input" type="text" value="<%= first_name %>"/>
 		<input class="last_name-input" type="text" value="<%= last_name %>"/>
 		<a class="save-item btn btn-small" href="#"><i class="icon-ok"></i></a>
 	</div>
+	<hr/>
 </div>

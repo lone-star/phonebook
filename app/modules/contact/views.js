@@ -2,11 +2,14 @@ define([
 	//Application
 	'app',
 
+	//Modules
+	'modules/phoneEntry',
+
 	//Libs
 	'backbone'
 ],
 
-function(app, Backbone) {
+function(app, PhoneEntry, Backbone) {
   var Views = {};
 
 	Views.Item = Backbone.View.extend({
@@ -15,7 +18,8 @@ function(app, Backbone) {
 		events: {
 			'click .edit-item': 'startEdit',
 			'click .save-item': 'finishEdit',
-			'click .remove-item': 'removeItem'
+			'click .remove-item': 'removeItem',
+			'click .display': 'showPhone'
 		},
 		serialize: function() {
 			return {
@@ -35,30 +39,42 @@ function(app, Backbone) {
 			}, this);
 		},
 		startEdit: function() {
-			//console.log('start edit');
+			// console.log('start edit');
+			this.$el.addClass('editing');
+			//don't trigger parent element
+			return false;
 		},
 		finishEdit: function() {
-			//console.log('finish edit');
+			// console.log('finish edit');
+			this.$el.removeClass('editing');
       this.model.set(this.updatedAttributes());
 		},
 		removeItem: function() {
-			//console.log('remove Item');
+			// console.log('remove Item');
+			PhoneEntry.setContactModel(null);
 			this.model.destroy();
+			// don't trigger parent element
+			return false;
+		},
+		showPhone: function() {
+			// console.log('show phone');
+			PhoneEntry.setContactModel(this.model);
 		}
 	});
 
 	Views.List = Backbone.View.extend({
 		tagName: 'ul',
-		render: function(manage) {
+		beforeRender: function() {
 			this.collection.each(function(item){
 				this.insertView(new Views.Item({
 					model: item
 				}));
 			}, this);
-
-			return manage(this).render();
 		},
 		initialize: function() {
+			// Style of the list
+			this.$el.addClass('unstyled');
+
 			//listen for new models
 			this.collection.on('add', function(item) {
 				this.insertView(new Views.Item({
@@ -72,7 +88,8 @@ function(app, Backbone) {
 					return view.model === item;
 				}).remove();
 			}, this);
-		}
+			
+		},
 	});
 
 	Views.Form = Backbone.View.extend({

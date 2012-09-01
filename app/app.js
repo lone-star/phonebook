@@ -10,6 +10,10 @@ define([
 
 function($, _, Backbone) {
 
+	require(['bootstrap'], function() {
+		$('body').off('.data-api');
+	});
+
   // Provide a global location to place configuration settings and module
   // creation.
   var app = {
@@ -25,6 +29,7 @@ function($, _, Backbone) {
 
   // Configure LayoutManager with Backbone Boilerplate defaults.
   Backbone.LayoutManager.configure({
+		manage: true,
     paths: {
       layout: "app/templates/layouts/",
       template: "app/templates/"

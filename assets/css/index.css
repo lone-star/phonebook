@@ -1,1 +1,47 @@
-@import "h5bp.css";
+/*@import "h5bp.css";*/
+@import "bootstrap.css";
+
+
+/* Items */
+
+ul li{
+	font-size: large;
+	color: #494949;
+}
+
+ul li:hover{
+	color: #000000;
+}
+
+ul li div .display .phone-arrow{
+	display: none;
+	float: right;
+}
+
+ul li:hover div .display .phone-arrow{
+	display: block;
+}
+
+ul li div .display{
+	display: block;
+	padding: 1em;
+}
+
+ul li.editing div .display{
+	display: none;
+}
+
+ul li div .edit {
+	display: none;
+	padding: 1em;
+}
+
+ul li.editing div .edit {
+	display: block;
+}
+
+
+.hidden{
+	display: none;
+}
+

@@ -18,6 +18,9 @@ function(app, Backbone) {
 		setModel: function(model) {
 			this.model = model;
 			this.trigger('modelset', this.model);
+		},
+		getContactId: function() {
+			return contactEvent.model.get('id');
 		}
 	};
 	_.extend(contactEvent, Backbone.Events);
@@ -50,14 +53,16 @@ function(app, Backbone) {
 			}, this);
 		},
 		startEdit: function() {
-			//console.log('start edit');
+			// console.log('start edit');
+			this.$el.addClass('editing');
 		},
 		finishEdit: function() {
-			//console.log('finish edit');
+			// console.log('finish edit');
+			this.$el.removeClass('editing');
 			this.model.set(this.updatedAttributes());
 		},
 		removeItem: function() {
-			//console.log('remove item');
+			// console.log('remove item');
 			this.model.destroy();
 		}
 	});
@@ -65,16 +70,18 @@ function(app, Backbone) {
 
 	Views.List = Backbone.View.extend({
 		tagName: 'ul',
-		render: function(manage) {
+		beforeRender: function() {
 			this.collection.each(function(item) {
 				this.insertView(new Views.Item({
 					model: item
 				}));
 			}, this);
-
-			return manage(this).render();
 		},
 		initialize: function() {
+
+			// Style of the list
+      this.$el.addClass('unstyled');
+
 			//listen for new models
 			this.collection.on('add', function(item) {
 				this.insertView(new Views.Item({
@@ -91,26 +98,22 @@ function(app, Backbone) {
 
 			//listen for modification of the contact model
 			contactEvent.on('modelset', function() {
-				this.collection.url = app.root
-					+ 'server/index.php/contacts/'
-					+ contactEvent.model.get('id')
-					+ '/phones/';
-				this.collection.fetch();
-				
+				if(!_.isNull(contactEvent.model)&&
+						!_.isUndefined(contactEvent.model)){
+
+					this.collection.url = app.root
+						+ 'server/index.php/contacts/'
+						+ contactEvent.model.get('id')
+						+ '/phones/';
+					this.collection.fetch();
+				} else {
+					this.collection.reset();
+				}
 			}, this);
 			
 			//listen for reset of the collection
 			this.collection.on('reset', function() {
 				this.render();
-				/*
-				console.log(this.el);
-				this.render(function(el) {
-					console.log(el);
-					console.log(this.collection.length);
-				}, this);
-
-				console.log(this.collection);
-				*/
 			}, this);
 		}
 	});
@@ -125,12 +128,12 @@ function(app, Backbone) {
 			return {
 				number: this.$('#new-phone-number').val(),
 				type: this.$('#new-phone-type').val(),
-				contact_id: contactEvent.model.id
+				contact_id: contactEvent.getContactId()
 			};
 		},
 		toggleSubmit: function() {
 			if(!this.collection.create(this.newAttributes())){
-				console.log('data not valid');
+				// console.log('data not valid');
 			} else {
 				this.clean();
 			}
@@ -143,14 +146,24 @@ function(app, Backbone) {
 			return {
 				phone_types: ['home', 'work', 'cellular', 'other']
 			};
+		},
+		initialize: function() {
+			// Listen if there is a model
+			contactEvent.on('modelset', function() {
+				this.render();
+			}, this);
+		},
+		afterRender: function() {
+			if (_.isUndefined(contactEvent.model) ||
+					_.isNull(contactEvent.model)){
+				this.$el.empty();
+			}
 		}
 	});
 
 	return {
 		Views: Views,
 		setContactModel: contactEvent.setModel,
-		getContactId: function() {
-			return contactEvent.model.get('id')
-		}
+		getContactId: contactEvent.getContactId
 	};
 });
