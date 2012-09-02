@@ -24,6 +24,7 @@ node_modules/
 ### Editors files
 #vim files
 *.swp
+.DS_Store
 
 ### HTACCESS
 .htaccess
