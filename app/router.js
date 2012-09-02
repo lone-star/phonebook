@@ -47,6 +47,8 @@ function(app, Contact, PhoneEntry) {
 				})
 			}).render();
 
+			// Get the collection
+			contacts.fetch();
     }
   });
   return Router;

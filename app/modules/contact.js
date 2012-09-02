@@ -18,13 +18,30 @@ function(app, Backbone, Views) {
   // Default model.
   Contact.Model = Backbone.Model.extend({
 		url: function() {
-			return app.root + 'server/index.php/contacts/';
+			
+			return app.root 
+				+ 'server/index.php/contacts/'
+				+ (_.isUndefined(this.id) ? '' : this.id);
+		},
+		validation: {
+			first_name: {
+				required: true,
+				rangeLength: [3, 40],
+			},
+			last_name: {
+				required: true,
+				rangeLength: [3, 40],
+			}
 		}
   });
 
   // Default collection.
   Contact.Collection = Backbone.Collection.extend({
-    model: Contact.Model
+		url: app.root + 'server/index.php/contacts/',
+    model: Contact.Model,
+		comparator: function(contact) {
+			return contact.get('last_name').toLowerCase();
+		}
   });
 
 	// Attach the Views sub-module

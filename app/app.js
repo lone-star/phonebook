@@ -3,16 +3,17 @@ define([
   "jquery",
   "lodash",
   "backbone",
+	"bootstrap",
 
   // Plugins.
-  "plugins/backbone.layoutmanager"
+  "plugins/backbone.layoutmanager",
+	"plugins/backbone-validation.min"
+
 ],
 
 function($, _, Backbone) {
 
-	require(['bootstrap'], function() {
-		$('body').off('.data-api');
-	});
+	$('body').off('.data-api');
 
   // Provide a global location to place configuration settings and module
   // creation.
@@ -20,6 +21,9 @@ function($, _, Backbone) {
     // The root path to run the application.
     root: "/~benjamin/"
   };
+
+	// Configure backbone validation
+	_.extend(Backbone.Model.prototype, Backbone.Validation.mixin);
 
   // Localize or create a new JavaScript Template object.
   var JST = window.JST = window.JST || {};

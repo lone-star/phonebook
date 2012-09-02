@@ -22,13 +22,30 @@ function(app, Backbone, Views) {
 			return app.root
 				+ 'server/index.php/contacts/'
 				+ PhoneEntry.getContactId()
-				+ '/phones/';
+				+ '/phones/'
+				+ (_.isUndefined(this.id) ? '' : this.id);
+		},
+		validation: {
+			number: {
+				required: true,
+				rangeLength: [3, 20]
+			},
+			type: {
+				required: true,                           
+				oneOf: ['home', 'cellular', 'work', 'other']
+			}
 		}
   });
 
   // Default collection.
   PhoneEntry.Collection = Backbone.Collection.extend({
-    model: PhoneEntry.Model
+    model: PhoneEntry.Model,
+		url: function() {
+			return app.root
+				+ 'server/index.php/contacts/'
+				+ PhoneEntry.getContactId()
+				+ '/phones/';
+		}
   });
 
 	// Attach the Views sub-module

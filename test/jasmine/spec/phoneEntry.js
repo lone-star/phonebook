@@ -375,7 +375,7 @@ describe('Phone Entry', function() {
 							.toBe(0);
 
 						//the url of a new model corresponds to the model
-						expect(model.url() + model.id + '/phones/')
+						expect(model.url() + '/phones/')
 							.toBe((new PhoneEntry.Model({
 								number: '987654321',
 								type: 'work'

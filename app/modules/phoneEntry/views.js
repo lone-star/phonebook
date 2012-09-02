@@ -9,8 +9,9 @@ define([
 function(app, Backbone) {
 	var Views = {};
 
-	//Contact Event will keep the views updated of the currently
-	//displayed contact
+	// Contact Event will keep the views updated of the currently
+	// displayed contact
+	// It will trigger the "modelset" event when the model is changed
 	var contactEvent = {
 		model: null,
 		
@@ -34,6 +35,7 @@ function(app, Backbone) {
 			'click .save-item': 'finishEdit',
 			'click .remove-item': 'removeItem'
 		},
+		// Provide attributes for the template
     serialize: function() {
 			return {
 				number: this.model.get('number'),
@@ -48,18 +50,81 @@ function(app, Backbone) {
 			};
 		},
 		initialize: function() {
+			// When the model is updated
 			this.model.on('change', function() {
 				this.render();
 			}, this);
+
+			// To keep the model synced with the server
+			this.intervalSync = setInterval(_.bind(function() {
+				this.model.fetch({error: this.errorFetchingModel});
+			}, this), 10000);
+			
+			// When the model is destroyed
+			this.model.on('destroy', function() {
+				// Stop checking the server
+				clearInterval(this.intervalSync);
+			}, this);
+
+			// Listen for modification of the contact model
+			contactEvent.on('modelset', function() {
+				if(_.isNull(contactEvent.model) ||
+						!_.isUndefined(contactEvent.model)){
+          clearInterval(this.intervalSync);
+				}
+			}, this);
+
+			// Binding methods
+			this.errorFetchingModel = _.bind(this.errorFetchingModel, this);
+		},
+		errorFetchingModel: function(model, error) {
+			// The model has been destroyed from the server
+			if (error.status === 404) {
+				this.model.destroy();
+			}
 		},
 		startEdit: function() {
 			// console.log('start edit');
 			this.$el.addClass('editing');
 		},
 		finishEdit: function() {
-			// console.log('finish edit');
-			this.$el.removeClass('editing');
-			this.model.set(this.updatedAttributes());
+			// Get the attributes
+			var attr = this.updatedAttributes();
+			this.$('.save-item').popover('destroy');
+
+			// Verify validation
+			if(!this.model.set(attr)) {
+				this.$('.save-item').popover({
+					animation: 'show',
+					placement: 'bottom',
+					title: 'Error',
+					content: _.bind(function() {
+						
+						// For each attributes of the model
+						return _.chain(_.keys(this.model.attributes))
+
+							// Get the validation message error
+							.map(function(key) {
+								return this.model.preValidate(key, attr[key]);
+							}, this)
+
+							// Reject attribute if there is no validation message error
+							.reject(function(str) {
+								return _.isEmpty(str);
+							})
+
+							// Generate message to display
+							.reduce(function(m, n) {
+								return (_.isNull(m) ? '' : m + '<br/><br/>') + n;
+							}, null)
+							.value();
+					}, this)
+				});
+				this.$('.save-item').popover('show');
+			} else {
+				this.$el.removeClass('editing');
+				this.model.save();
+			}
 		},
 		removeItem: function() {
 			// console.log('remove item');
@@ -78,25 +143,24 @@ function(app, Backbone) {
 			}, this);
 		},
 		initialize: function() {
-
 			// Style of the list
       this.$el.addClass('unstyled');
 
-			//listen for new models
+			// Listen for new models
 			this.collection.on('add', function(item) {
 				this.insertView(new Views.Item({
 					model: item
 				})).render();
 			}, this);
 
-			//listen for delete models
+			// Listen for delete models
 			this.collection.on('remove', function(item) {
 				this.getView(function(view) {
 					return view.model === item;
 				}).remove();
 			}, this);
 
-			//listen for modification of the contact model
+			// Listen for modification of the contact model
 			contactEvent.on('modelset', function() {
 				if(!_.isNull(contactEvent.model)&&
 						!_.isUndefined(contactEvent.model)){
@@ -111,10 +175,18 @@ function(app, Backbone) {
 				}
 			}, this);
 			
-			//listen for reset of the collection
+			// Listen for reset of the collection
 			this.collection.on('reset', function() {
 				this.render();
 			}, this);
+
+			// Keep the phone entry list up to date
+			setInterval(_.bind(function() {
+				if(!_.isNull(contactEvent.model)&&
+						!_.isUndefined(contactEvent.model)){
+					this.collection.fetch({add: true});
+				}
+			}, this), 10000);
 		}
 	});
 
@@ -132,9 +204,25 @@ function(app, Backbone) {
 			};
 		},
 		toggleSubmit: function() {
-			if(!this.collection.create(this.newAttributes())){
-				// console.log('data not valid');
+      var model = new this.collection.model(this.newAttributes());
+
+			// Validation
+			this.$('#new-phone-submit').popover('destroy');
+			if(!model.isValid(['number', 'type'])){
+				this.$('#new-phone-submit').popover({
+					animation: 'show',
+					placement: 'bottom',
+					title: 'Error',
+					content: function() {
+						return _.reduce(model.validate(), function(m, n) {
+							return (_.isNull(m) ? '' : m + '<br/><br/>') + n;
+						}, null);
+					}
+				});
+				this.$('#new-phone-submit').popover('show');
 			} else {
+				model.save();
+				this.collection.add(model);
 				this.clean();
 			}
 		},
@@ -150,6 +238,7 @@ function(app, Backbone) {
 		initialize: function() {
 			// Listen if there is a model
 			contactEvent.on('modelset', function() {
+				this.$('#new-phone-submit').popover('destroy');
 				this.render();
 			}, this);
 		},

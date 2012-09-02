@@ -14,12 +14,17 @@ ul li:hover{
 }
 
 ul li div .display .phone-arrow{
-	display: none;
 	float: right;
+  color: #C3C3C3;
+}
+
+.selected-row{
+	font-size: xx-large;
+	font-weight: bold;
 }
 
 ul li:hover div .display .phone-arrow{
-	display: block;
+	color: #888888;
 }
 
 ul li div .display{
@@ -41,7 +46,4 @@ ul li.editing div .edit {
 }
 
 
-.hidden{
-	display: none;
-}
 

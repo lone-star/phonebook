@@ -24,7 +24,11 @@ require.config({
     },
 
     // Backbone.LayoutManager depends on Backbone.
-    "plugins/backbone.layoutmanager": ["backbone"]
+    "plugins/backbone.layoutmanager": ["backbone"],
+		"plugins/backbone-validation.min": ["backbone"],
+
+		// Backbone bootstrap
+		bootstrap: ["jquery"] 
   }
 
 });
