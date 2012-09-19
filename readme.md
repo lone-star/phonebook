@@ -92,3 +92,5 @@ To do so we would extend the Backbone Views with the function which are similar 
 ### Tests
 Tests currently focuse on the views functionalities. They do not consider the synchronization, or the existance of multiple clients.
 In order to make them effective, the tests should implement these requirements. 
+
+CC
