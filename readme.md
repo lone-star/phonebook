@@ -94,3 +94,4 @@ Tests currently focuse on the views functionalities. They do not consider the sy
 In order to make them effective, the tests should implement these requirements. 
 
 CC
+Other modif of the readme
